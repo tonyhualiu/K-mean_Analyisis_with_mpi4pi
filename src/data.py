@@ -21,7 +21,11 @@ class Data:
         Add to data with another data
         '''
         pass
-    
+    def __str__(self):
+        '''
+        format output
+        '''
+        pass
 
 class Point(Data):
     def __init__(self, x, y):
@@ -34,3 +38,7 @@ class Point(Data):
     def add(self, anotherPoint):
         self.x += anotherPoint.x
         self.y += anotherPoint.y
+    def __str__(self):
+        return str(self.x)+' '+str(self.y)
+    def __repr__(self):
+        return self.__str__()

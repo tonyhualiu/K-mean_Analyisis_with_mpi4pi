@@ -40,48 +40,77 @@ def processLine (line, type):
     '''
     line = line.split(',')
     if type == 'point':
-        return Point(double(line[0]), double(line[1]))
+        return Point(float(line[0]), float(line[1]))
     elif type == 'DNA':
         return None #not implemented yet
+
+##### end of helper function definitions #####
 
 ###################### main routine ############################
 
 #get commandline input, currently hard code
 numOfCluster = 2
-lineOfData = 10
 input = 'test.data'
 typeOfData = 'point' #can be point or DNA
+threshold = 0.05 # when that amount of data does not move, the iteration stops
 
 #get MPI attributes
 size = MPI.COMM_WORLD.Get_size()
 rank = MPI.COMM_WORLD.Get_rank()
+comm = MPI.COMM_WORLD
 
 #initialize time
 startTime = time.time()
 
-#read in file
+####### read in data from file #######
 currentRank = 0
-splitLength = calLineForEachProcessor(lineOfData, size)
+splitLength = 0 #calLineForEachProcessor(lineOfData, size)
 
 #DataSet 
 dataset = []
 
 while currentRank < size:
     if currentRank == rank: #assign job to different node
-        lineNo = 1;
-        while lineNo <= splitLength:
-            line = linecache.getline(input, lineno)
+        lineNo = currentRank + 1;
+        lineCount = 0
+        while True:
+            line = linecache.getline(input, lineNo)
             if line == '':
                 break
-            data = processLine(line, typeOfData)
-            
-    currentRank++
-        
-        
+            data = processLine(line, typeOfData)    #construct data from file
+            dataset.append(data)    #add to dataset
+            lineCount += 1
+            lineNo += size
+        splitLength = lineCount
+        print dataset        
+    currentRank += 1
 
-p1 = Point(2, 2)
-p2 = Point(2, 3)
+####### end of read in data from file #######
 
-p1.belongto = 1
+####### node 0 broadcast the centroid as the first k observations #######
+centroid = []
 
-print startTime
+if rank == 0:
+    centroid = dataset[:numOfCluster]
+else:
+    centroid = None
+
+centroid = comm.bcast(centroid, root = 0)
+####### initial centroid is ready #######
+
+####### iterate calculation #######
+
+#init some variables
+sumOfClusterN = []
+currentThreshold = 0.0
+i = 0
+
+while i < numOfCluster:
+    sumOfClusterN.append(0)
+
+while currentThreashold > threashold:
+    
+
+print 'centroid',centroid
+
+print 'start time',startTime
