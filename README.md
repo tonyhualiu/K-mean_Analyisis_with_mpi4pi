@@ -1,13 +1,17 @@
 Kmean_Analyisis_with_mpi4pi
 ============================
 
-This is the project to test github collaboration.
+Project Schedule:
 
-Let's try to push some file with modificationl.
-
-This sentence is used to test git
-
-
-This is a test sentence on a new Branch
-
-can you merge your branch?
+Mon
+	data generator: dev, test
+	sequential analysis: dev
+	parallel analysis: dev
+Tues
+	sequential analysis: test, perfection (with command line input.. etc)
+	parallel analyisis: test, perfection (with command line input.. etc)
+Wed
+	report draft, draw graphs and charts
+Thur
+	finish report, handin
+	
