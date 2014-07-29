@@ -104,6 +104,20 @@ def reCalculateCentroid(localSum, numOfCluster):
         i += 1
     return centroid
     
+def isProceed(percentage, threshold): 
+    '''
+    decide if to proceed
+    @param percentage: list, reclustering data from each node
+    @param threshold: user set threshold
+    @return: true if need to proceed, false if not  
+    '''
+    sum = 0.0
+    for i in range(len(percentage)):
+        sum += percentage[i]
+    if sum / len(percentage) > threshold:
+        return True
+    else:
+        return False
 ##### end of helper function definitions #####
 
 ###################### main routine ############################
@@ -162,32 +176,42 @@ print 'processor',RANK,"centroid is",centroid
 
 ####### iterate calculation #######
 
-#init some variables
-currentThreshold = 0.0
-i = 0
-numOfRecluster = 0
+proceed = True
+while proceed:
+    #init variable
+    localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER)
+    numOfRecluster = 0.0
+    #calculate cluster belonging locally
+    for data in dataset:
+        belong = toCluster(data, centroid)
+        if data.belongTo != belong:
+            numOfRecluster += 1
+            data.belongTo = belong
+        localSum[belong][0].add(data)
+        localSum[belong][1] += 1
+    print "Processor", RANK, "localSum", localSum
+    
+    #send numOfRecluster to node 0 and determine if we need to proceed
+    numOfRecluster /= splitLength
+    numOfRecluster = COMM.gather(numOfRecluster, root=0)
+    if RANK == 0:
+        proceed = isProceed(numOfRecluster, THRESHOLD)
+    else:
+        proceed = None
+    proceed = COMM.bcast(proceed, root = 0)
+        
+    if proceed is True:
+        #send localSum to node 0 and recalculate the centroid, broadcast new centroid
+        localSum = COMM.gather(localSum, root=0)
+        if RANK == 0:
+            print 'processor',RANK,'receive',localSum
+            centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER)
+            print 'new centroid is:',centroid
+        else:
+            centroid = None
+        centroid = COMM.bcast(centroid, root = 0)
+    else:
+        break
 
-#while currentThreashold > threashold:
-localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER)
-#calculate cluster belonging locally
-for data in dataset:
-    belong = toCluster(data, centroid)
-    if data.belongTo != belong:
-        numOfRecluster += 1
-        data.belongTo = belong
-    localSum[belong][0].add(data)
-    localSum[belong][1] += 1
-
-print "Processor", RANK, "localSum", localSum
-
-#send localSum to node 0 and recalculate the centroid, broadcast new centroid
-localSum = COMM.gather(localSum, root=0)
-if RANK == 0:
-    print 'processor',RANK,'receive',localSum
-    centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER)
-    print 'new centroid is:',centroid
-else:
-    centroid = None
-centroid = COMM.bcast(centroid, root = 0)
-
+print 'processor',RANK,'data:',dataset
 print 'start time',startTime

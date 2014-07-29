@@ -52,7 +52,7 @@ class Point(Data):
             self.y /= num
         
     def __str__(self):
-        return str(self.x)+'-'+str(self.y)
+        return str(self.x)+'-'+str(self.y)+':'+str(self.belongTo)
     
     def __repr__(self):
         return self.__str__()
