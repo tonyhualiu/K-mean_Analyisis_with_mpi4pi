@@ -78,7 +78,7 @@ def createDNA (dnas, variance):
 
     for i in range(length):
         if i in randomSampledIndice:
-            result += random.choice('ACGT'.replcace(dnas[i], ''))
+            result += random.choice('ACGT'.replace(dnas[i], ''))
         else:
             result += dnas[i]
     return result
@@ -114,7 +114,7 @@ for i in range (0, numClusters):
     variance = random.randint(minVar, maxVar)
     cluster = centroidsDNA[i]
     for j in range (0, numDNA):
-        writer.write(createDNAcentroid(cluster, variance))
+        writer.write(createDNA(cluster, variance))
         writer.write('\n')
 
 
