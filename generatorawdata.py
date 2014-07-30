@@ -11,9 +11,9 @@ import numpy
 def usage():
     print '$> python generatorawdata.py <required args> [optional args]\n' + \
         '\t-c <#>\t\tNumber of clusters to generate\n' + \
-        '\t-d <#>\t\tNumber of DNA strands per cluster\n' + \
+        '\t-p <#>\t\tNumber of DNA strands per cluster\n' + \
         '\t-o <file>\tFilename for the output of the raw data\n' + \
-        '\t-l [#]\t\tMaximum length of each DNA strand\n'
+        '\t-v [#]\t\tMaximum length of each DNA strand\n'
 
 def handleArgs(args):
     # set up default return value
@@ -23,7 +23,7 @@ def handleArgs(args):
     length = 20
 
     try:
-        optlist, args = getopt.getopt()
+        optlist, args = getopt.getopt(args[1:],'c:p:v:o:')
     except getopt.GetoptError, err:
         print str(err)
         usage()
