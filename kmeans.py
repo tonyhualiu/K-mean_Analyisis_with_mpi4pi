@@ -146,7 +146,8 @@ def computeDistance (pointOne, pointTwo):
 
     
 ### Testing code ###
-dataset = loadCSV("./test_2D_points.txt")
+#dataset = loadCSV("./test_2D_points.txt")
+dataset = loadCSV("src/test.data")
 clusters = kmeans(3, dataset)
 print clusters["clusters"]
 print clusters["centroids"]
