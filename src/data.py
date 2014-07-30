@@ -1,11 +1,12 @@
 '''
 File Name: data.py
-Course: 15619
+Course: 15640
 Project: 4
 @author: Tony Liu (andrewID: hualiu)
 '''
 
 from math import sqrt
+import sys
 
 class Data:
     def distance(self, anotherData):
@@ -57,18 +58,61 @@ class Point(Data):
     def __repr__(self):
         return self.__str__()
     
-class DNA(data):
-    def __init__(self):
-        self.data = []
-        
-    def __init__(self, list):
-        self.data = list
+class DNA(Data):
+    def __init__(self, dna):
+        self.data = dna
+        self.counter = []
+        for d in dna:
+            c = DNACounter()
+            c.increment(d)
+            self.counter.append(c) 
     def distance(self, anotherDNA):
         retval = 0
         for i in range(len(self.data)):
-            if self.data[i] != anotherDNA[i]:
+            if self.data[i] != anotherDNA.data[i]:
                 retval += 1
         return retval
     def add(self, anotherDNA):
-        for i in range(self.data):
-            if self.data
+        for i in range(len(self.data)):
+            self.counter[i].increment(anotherDNA.data[i])
+    def avg(self, num):
+        for i in range(len(self.counter)):
+            maxLetter = 'A'
+            maxFrequence = 0
+            for key in self.counter[i].counter.keys():
+                if self.counter[i].counter[key] > maxFrequence:
+                    maxLetter = key
+                    maxFrequence = self.counter[i].counter[key]
+            self.data[i] = maxLetter
+    def __str__(self):
+        return str(self.data)
+    def __repr__(self):
+        return self.__str__()
+            
+            
+class DNACounter:
+    def __init__(self):
+        self.counter = {'A': 0, 'C': 0 , 'G': 0, 'T' : 0}
+    def increment(self,letter):
+        self.counter[letter] += 1
+    def __str__(self):
+        return str(self.counter)
+    def __repr__(self):
+        return self.__str__()
+        
+        
+##test##
+d1 = DNA(['A','C','G','T'])
+d2 = DNA(['A','G','C','T'])
+d3 = DNA(['A','G','C','A'])
+
+#print d1.counter
+#print d2.counter
+
+
+print d1.distance(d2)
+
+d1.add(d2)
+d1.add(d3)
+d1.avg(0)
+print d1

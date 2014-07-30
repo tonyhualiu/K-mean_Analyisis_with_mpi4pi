@@ -1,7 +1,7 @@
 from data import Point
 from mpi4py import MPI 
 
-
+'''
 SIZE = MPI.COMM_WORLD.Get_size()
 RANK = MPI.COMM_WORLD.Get_rank()
 COMM = MPI.COMM_WORLD
@@ -16,3 +16,6 @@ else:
    assert data is None
 
 print "processor",RANK,'DATA',data
+'''
+s = "actg"
+print list(s)

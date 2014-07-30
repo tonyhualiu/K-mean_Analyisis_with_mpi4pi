@@ -1,6 +1,6 @@
 '''
 File Name: ParallelMachine.py
-Course: 15619
+Course: 15640
 Project: 4
 @author: Tony Liu (andrewID: hualiu)
 '''
@@ -39,11 +39,12 @@ def processLine (line, type):
     @param type: type of data
     @return: one data item
     '''
-    line = line.split(',')
     if type == 'point':
+        line = line.split(',')
         return Point(float(line[0]), float(line[1]))
     elif type == 'DNA':
-        return None #not implemented yet
+        line = list(line)
+        return DNA(line)
 
 def constructLocalSum(type, numOfCluster):
     '''
