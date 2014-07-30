@@ -72,7 +72,6 @@ def kmeans(k, sampleData, startingCentroids=None):
         # 
         previousRoundOfCentroids = centroids
         centroids = getCentroids(clusters)
-        print "centroids 75",centroids
         #
         threshold = 0
         for i in range(len(centroids)):
