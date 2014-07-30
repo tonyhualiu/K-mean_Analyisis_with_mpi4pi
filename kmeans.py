@@ -17,7 +17,7 @@ def loadCSV (filename):
     fileReader = open(filename, "r+")
     lines = fileReader.readlines()
     fileReader.close()
-
+    
     dataArray = []
     for line in lines:
         data = convertToTuple(line)
@@ -35,6 +35,7 @@ def convertToTuple(line):
     # convert string to number
     for i in range(len(dataArray)):
         dataArray[i] = float(dataArray[i])
+    return dataArray
 
 
 ##########################
@@ -59,10 +60,8 @@ def kmeans(k, sampleData, startingCentroids=None):
     clusters = []
     for i in range(k):
         clusters.append([])
-    
     # 
     clusters[0] = sampleData
-    
     # start iteration
     iterationCounter = 0
     previousRoundOfCentroids = []
@@ -88,6 +87,8 @@ def kmeans(k, sampleData, startingCentroids=None):
 
 def reformCluster(sampleData, centroids):
     # reformCluster the list of lists to store all the data
+    print "sampledata",sampleData
+    print "centroids",centroids
     clusters = []
     for i in range(len(centroids)):
         clusters.append([])
@@ -95,7 +96,7 @@ def reformCluster(sampleData, centroids):
     for data in sampleData:
         # find which cluster the data belongs to 
         clusterIndex = findMinDistanceIndex(data, centroids)
-        clusters[clusterIndex].append(data)     
+        clusters[clusterIndex].append(data)   
     return clusters
               
        
@@ -105,32 +106,34 @@ def findMinDistanceIndex(point, centroids):
     index = 0
     for i in range(1, len(centroids)):
         tmp = computeDistance(point, centroids[i])
-        if (tmp < min):
+        if tmp < minDistance:
             minDistance = tmp
             index = i
     return index
 
 def getCentroids (clusters):
     centroids = []
+    print "clusters",clusters
     for i in range(len(clusters)):
         centroid = getMeanForOneCluster(clusters[i])
         centroids.append(centroid)
     return centroids
     
-def getMeanForOneCluster (list):
+def getMeanForOneCluster (lists):
     # corner case
-    if (len(list) == 0):
+    if len(lists) == 0:
         return
-    # 
-    numOfAttributes = len(list[0])
+    #
+    print "lists[0]" ,lists
+    numOfAttributes = len(lists[0])
     means = [0] * (numOfAttributes - 1)
     #
-    for item in list:
+    for item in lists:
         for i in range(1, numOfAttributes):
             means[i] = means[i] + item[i]
     #         
     for j in range(1, numOfAttributes):
-        means[j] = means[j] / float(len(list))
+        means[j] = means[j] / float(len(lists))
     return tuple(means)
 
 def computeDistance (pointOne, pointTwo):
@@ -139,8 +142,8 @@ def computeDistance (pointOne, pointTwo):
         return float("inf")
     # normal form
     result = 0
-    for i in range(1, len(pointOne)):
-        result = result + (pointOne[i] - pointTwo[i]) ** 2
+    for i in range(len(pointOne)):
+        result += (pointOne[i] - pointTwo[i]) ** 2
     return result
 
 
