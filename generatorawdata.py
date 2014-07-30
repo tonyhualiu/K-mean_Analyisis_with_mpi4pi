@@ -78,9 +78,9 @@ def createDNA (dnas, variance):
 
     for i in range(length):
         if i in randomSampledIndice:
-            result += random.choice('ACGT'.replace(dnas[i], ''))
+            result = result + random.choice('ACGT'.replace(dnas[i], ''))
         else:
-            result += dnas[i]
+            result = result + dnas[i]
     return result
 
 
