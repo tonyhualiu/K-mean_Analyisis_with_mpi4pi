@@ -56,3 +56,19 @@ class Point(Data):
     
     def __repr__(self):
         return self.__str__()
+    
+class DNA(data):
+    def __init__(self):
+        self.data = []
+        
+    def __init__(self, list):
+        self.data = list
+    def distance(self, anotherDNA):
+        retval = 0
+        for i in range(len(self.data)):
+            if self.data[i] != anotherDNA[i]:
+                retval += 1
+        return retval
+    def add(self, anotherDNA):
+        for i in range(self.data):
+            if self.data

@@ -95,7 +95,6 @@ def reCalculateCentroid(localSum, numOfCluster):
             for j in range(numOfCluster):
                 localSum[0][j][0].add(localSum[i][j][0])
                 localSum[0][j][1] += (localSum[i][j][1])
-    print 'here',localSum[0]
     i = 0;
     centroid = [];
     while i < numOfCluster:
