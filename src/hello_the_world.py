@@ -1,7 +1,7 @@
 from data import Point
 from mpi4py import MPI 
 
-
+'''
 SIZE = MPI.COMM_WORLD.Get_size()
 RANK = MPI.COMM_WORLD.Get_rank()
 COMM = MPI.COMM_WORLD
@@ -15,4 +15,5 @@ if RANK == 0:
 else:
    assert data is None
 
-print "processor",RANK,'DATA',data
+pint "processor",RANK,'DATA',data
+'''

@@ -55,23 +55,23 @@ def kmeans (k, sampleDNAs, startingCentroids = None):
     # if this is not the first phase of the calculation, used the previous centroids
     else:
         centroids = startingCentroids
-
+        
     # allocating a new list of lists to store the DNA
     clusters = []
     for i in range(k):
         clusters.append([])
     # intialize by putting all the DNAs in the first cluster
     clusters[0] = sampleDNAs
-
+    
     # start the iteration
     iterationCounter = 0
     previousRoundOfCentroids = []
 
 
     ###########
-    print 'centroids, ', centroids
+    print 'centroids 72, ', centroids
     type(centroids)
-    print 'previousRoundOfCentroids, ', previousRoundOfCentroids
+    print 'previousRoundOfCentroids 74, ', previousRoundOfCentroids
     type(previousRoundOfCentroids)
     ###########
     
@@ -187,4 +187,4 @@ def getMeanForOneCluster(lists):
 # ### Testing code ###
 dataset = loadDNA("./output.txt")
 clusters = kmeans(3, dataset)
-print clusters
+#print clusters
