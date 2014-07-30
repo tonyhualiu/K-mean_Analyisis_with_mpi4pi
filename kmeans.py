@@ -72,6 +72,7 @@ def kmeans(k, sampleData, startingCentroids=None):
         # 
         previousRoundOfCentroids = centroids
         centroids = getCentroids(clusters)
+        print "centroids 75",centroids
         #
         threshold = 0
         for i in range(len(centroids)):
@@ -87,8 +88,8 @@ def kmeans(k, sampleData, startingCentroids=None):
 
 def reformCluster(sampleData, centroids):
     # reformCluster the list of lists to store all the data
-    print "sampledata",sampleData
-    print "centroids",centroids
+   # print "sampledata",sampleData
+   # print "centroids",centroids
     clusters = []
     for i in range(len(centroids)):
         clusters.append([])
@@ -113,9 +114,10 @@ def findMinDistanceIndex(point, centroids):
 
 def getCentroids (clusters):
     centroids = []
-    print "clusters",clusters
+    print "clusters 117",clusters
     for i in range(len(clusters)):
         centroid = getMeanForOneCluster(clusters[i])
+        #print "i",i,"centroid",centroid
         centroids.append(centroid)
     return centroids
     
@@ -124,16 +126,17 @@ def getMeanForOneCluster (lists):
     if len(lists) == 0:
         return
     #
-    print "lists[0]" ,lists
     numOfAttributes = len(lists[0])
-    means = [0] * (numOfAttributes - 1)
+    means = [0] * numOfAttributes
     #
     for item in lists:
-        for i in range(1, numOfAttributes):
-            means[i] = means[i] + item[i]
+        for i in range(numOfAttributes):
+            means[i] += item[i]
+    print "135 means, after sum",means
     #         
-    for j in range(1, numOfAttributes):
+    for j in range(numOfAttributes):
         means[j] = means[j] / float(len(lists))
+    print "139 means, after division",means
     return tuple(means)
 
 def computeDistance (pointOne, pointTwo):
@@ -152,6 +155,7 @@ def computeDistance (pointOne, pointTwo):
 #dataset = loadCSV("./test_2D_points.txt")
 dataset = loadCSV("src/test.data")
 clusters = kmeans(3, dataset)
-print clusters["clusters"]
-print clusters["centroids"]
-print clusters["threshold"]
+print clusters
+#print clusters["clusters"]
+#print clusters["centroids"]
+#print clusters["threshold"]
