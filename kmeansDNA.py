@@ -75,7 +75,7 @@ def kmeans (k, sampleDNAs, startingCentroids = None):
     type(previousRoundOfCentroids)
     ###########
     
-    while (centroids != previousRoundOfCentroids):
+    while (compareCentroids(centroids, previousRoundOfCentroids)):
         clusters = reformCluster(sampleDNAs, centroids)
         iterationCounter += 1
         #
@@ -94,6 +94,23 @@ def kmeans (k, sampleDNAs, startingCentroids = None):
     result["centroids"] = centroids
     result["threshold"] = threshold
     return result 
+
+def compareCentroids(centroidsOne, centroidsTwo):
+    '''
+    The centroids passed in should be in format of list of str
+    '''
+    if (len(centroidsOne) == 0 or len(centroidsTwo) == 0):
+        return True
+
+    for i in range(len(centroidsOne)):
+        print centroidsOne[i]
+        print centroidsTwo[i]
+        if centroidsOne[i] == centroidsTwo[i]:
+            continue
+        else:
+            return False
+    return True
+
 
 def reformCluster(sampleDNAs, centroids):
     clusters = []
@@ -187,4 +204,4 @@ def getMeanForOneCluster(lists):
 # ### Testing code ###
 dataset = loadDNA("./output.txt")
 clusters = kmeans(3, dataset)
-#print clusters
+print clusters
