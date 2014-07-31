@@ -1,6 +1,6 @@
 '''
 File Name: ParallelMachine.py
-Course: 15619
+Course: 15640
 Project: 4
 @author: Tony Liu (andrewID: hualiu)
 '''
@@ -12,15 +12,20 @@ import linecache
 import sys
 
 ##### helper function definitions #####
-'''
-def formatTime second:
-    
+
+def formatTime():
+    return time.strftime("%Y-%m-%d_%H-%M-%S",time.gmtime())
+
+def writeLog(event, logFile):
+    '''
     format the seconds into
     XX minutes XX seconds
-    @param param: time in second
-    @return: string after formatted
-    
-'''
+    @param msg: log message
+    @param logPath: the path of logfile 
+    '''
+    logFile.write(formatTime() + '\t' + event)
+    logFile.write('\n')
+
 
 def calLineForEachProcessor (lineOfData, size):
     '''
@@ -39,18 +44,20 @@ def processLine (line, type):
     @param type: type of data
     @return: one data item
     '''
-    line = line.split(',')
     if type == 'point':
+        line = line.split(',')
         return Point(float(line[0]), float(line[1]))
     elif type == 'DNA':
-        return None #not implemented yet
+        line = list(line.strip())
+        return DNA(line)
 
-def constructLocalSum(type, numOfCluster):
+def constructLocalSum(type, numOfCluster, lengthOfDNA):
     '''
     Construct local sum object. E.G. [[PointSum, numberInThisCluster], [PointSum, numberInThisCluster]]
     PointSum is the point representation of sum in each cluster
     @param  type: type of the data
     @param numOfCluster: number of cluster
+    @param lengthOfDNA: the length of DNA 
     @return: an initial localSum list  
     '''
     i = 0;
@@ -60,7 +67,7 @@ def constructLocalSum(type, numOfCluster):
         if type == 'point':
             initSum = [Point(0,0), 0]
         elif type == 'DNA':
-            pass #not implemented yet
+            initSum = [DNACounter(lengthOfDNA),0]
         local.append(initSum)
         i += 1
     return local;
@@ -81,7 +88,7 @@ def toCluster(data, centroid):
             minIndex = i
     return minIndex
 
-def reCalculateCentroid(localSum, numOfCluster):
+def reCalculateCentroid(localSum, numOfCluster,dataType):
     '''
     node 0 recalculate the centroid array
     @param localSum: the data gathered from other nodes
@@ -92,15 +99,21 @@ def reCalculateCentroid(localSum, numOfCluster):
         if i == 0:
             continue
         else:
-            for j in range(numOfCluster):
-                localSum[0][j][0].add(localSum[i][j][0])
-                localSum[0][j][1] += (localSum[i][j][1])
-    print 'here',localSum[0]
+            if dataType == "point":
+                for j in range(numOfCluster):
+                    localSum[0][j][0].add(localSum[i][j][0])
+                    localSum[0][j][1] += (localSum[i][j][1])
+            elif dataType == "DNA":
+                for j in range(numOfCluster):
+                    localSum[0][j][0].addCounter(localSum[i][j][0])
     i = 0;
     centroid = [];
     while i < numOfCluster:
-        localSum[0][i][0].avg(localSum[0][i][1])
-        centroid.append(localSum[0][i][0])
+        rt = localSum[0][i][0].avg(localSum[0][i][1])
+        if dataType == 'point':
+            centroid.append(localSum[0][i][0])
+        elif dataType == 'DNA':
+            centroid.append(rt)
         i += 1
     return centroid
     
@@ -122,27 +135,43 @@ def isProceed(percentage, threshold):
 
 ###################### main routine ############################
 
-#get COMMandline INPUT_FILE, currently hard code
-NUM_OF_CLUSTER = 2
-INPUT_FILE = 'test.data'
-TYPE_OF_DATA = 'point' #can be point or DNA
-THRESHOLD = 0.05 # when that amount of data does not move, the iteration stops
 
+#get commandline: python foo.py <number_of_cluster> <input_path> <type_of_data> [threashold] [logpath] 
+
+
+THRESHOLD = 0.000001
+LOG_PATH = 'log_' + formatTime()
+
+args = sys.argv[1:]
+NUM_OF_CLUSTER = int(args[0])
+INPUT_FILE =  args[1]
+TYPE_OF_DATA = args[2]
+if len(args) > 3: 
+    THRESHOLD = float(args[3])
+if len(args) > 4: 
+    LOG_PATH = args[4]
+
+log = open(LOG_PATH,"a")
 #get MPI attributes
 SIZE = MPI.COMM_WORLD.Get_size()
 RANK = MPI.COMM_WORLD.Get_rank()
 COMM = MPI.COMM_WORLD
 
-#initialize time
-startTime = time.time()
-
+#initialize log
+writeLog("Command line parsed",log)
+writeLog("Program start" ,log)
+writeLog("Num_Of_Cluster = " + str(NUM_OF_CLUSTER) ,log)
+writeLog("INPUT_FILE = " + INPUT_FILE ,log)
+writeLog("TYPE_OF_DATA = " + TYPE_OF_DATA ,log)
+writeLog("THRESHOLD = " + str(THRESHOLD) ,log)
+writeLog("LOG_PATH = " + LOG_PATH ,log)
 ####### read in data from file #######
-currentRank = 0
-splitLength = 0 #calLineForEachProcessor(lineOfData, size)
+writeLog("Start reading data " ,log)
 
+currentRank = 0
+splitLength = 0 
 #DataSet 
 dataset = []
-
 while currentRank < SIZE:
     if currentRank == RANK: #assign job to different node
         lineNo = currentRank + 1;
@@ -157,10 +186,13 @@ while currentRank < SIZE:
             lineNo += SIZE
         splitLength = lineCount       
     currentRank += 1
-print 'processor',RANK,'data is',dataset
+    
+writeLog("Finish reading data " ,log)
+currentRank = None
 ####### end of read in data from file #######
 
 ####### node 0 broadcast the centroid as the first k observations #######
+writeLog("Broadcasting centroids " ,log)
 #centroid list
 centroid = []
 
@@ -170,16 +202,16 @@ else:
     centroid = None
 
 centroid = COMM.bcast(centroid, root = 0)
-
-print 'processor',RANK,"centroid is",centroid
+writeLog("Processor " + str(RANK) +" Initial Centroid is " + str(centroid) ,log)
+writeLog("Finish broadcasting centroids " ,log)
 ####### initial centroid is ready #######
 
 ####### iterate calculation #######
-
+writeLog("Start calculation " ,log)
 proceed = True
 while proceed:
-    #init variable
-    localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER)
+    #init local sum and number of recluster
+    localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER, len(dataset[0]))
     numOfRecluster = 0.0
     #calculate cluster belonging locally
     for data in dataset:
@@ -189,7 +221,6 @@ while proceed:
             data.belongTo = belong
         localSum[belong][0].add(data)
         localSum[belong][1] += 1
-    print "Processor", RANK, "localSum", localSum
     
     #send numOfRecluster to node 0 and determine if we need to proceed
     numOfRecluster /= splitLength
@@ -204,14 +235,10 @@ while proceed:
         #send localSum to node 0 and recalculate the centroid, broadcast new centroid
         localSum = COMM.gather(localSum, root=0)
         if RANK == 0:
-            print 'processor',RANK,'receive',localSum
-            centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER)
-            print 'new centroid is:',centroid
+            centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER, TYPE_OF_DATA)
         else:
             centroid = None
         centroid = COMM.bcast(centroid, root = 0)
     else:
         break
-
-print 'processor',RANK,'data:',dataset
-print 'start time',startTime
+writeLog("Finish calculation " ,log)

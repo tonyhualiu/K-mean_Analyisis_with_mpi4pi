@@ -15,5 +15,6 @@ if RANK == 0:
 else:
    assert data is None
 
+<<<<<<< HEAD
 pint "processor",RANK,'DATA',data
 '''
