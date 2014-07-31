@@ -57,48 +57,56 @@ class Point(Data):
     
     def __repr__(self):
         return self.__str__()
+    def __len__(self):
+        return 0
     
 class DNA(Data):
     def __init__(self, dna):
         self.data = dna
-        self.counter = []
-        for d in dna:
-            c = DNACounter()
-            c.increment(d)
-            self.counter.append(c) 
+        self.belongTo = -1;
     def distance(self, anotherDNA):
         retval = 0
         for i in range(len(self.data)):
             if self.data[i] != anotherDNA.data[i]:
                 retval += 1
         return retval
-    def add(self, anotherDNA):
-        for i in range(len(self.data)):
-            self.counter[i].increment(anotherDNA.data[i])
-    def avg(self, num):
-        for i in range(len(self.counter)):
-            maxLetter = 'A'
-            maxFrequence = 0
-            for key in self.counter[i].counter.keys():
-                if self.counter[i].counter[key] > maxFrequence:
-                    maxLetter = key
-                    maxFrequence = self.counter[i].counter[key]
-            self.data[i] = maxLetter
     def __str__(self):
-        return str(self.data)
+        return str(self.data) + " " + str(self.belongTo)
     def __repr__(self):
         return self.__str__()
+    def __len__(self):
+        return len(self.data)
             
             
 class DNACounter:
-    def __init__(self):
-        self.counter = {'A': 0, 'C': 0 , 'G': 0, 'T' : 0}
-    def increment(self,letter):
-        self.counter[letter] += 1
+    def __init__(self, length):
+        self.counter = [{'A': 0, 'C': 0 , 'G': 0, 'T' : 0}] * length
+    def add(self, dna):
+        for i in range(len(dna)):
+            self.counter[i][dna.data[i]] += 1
+    def addCounter(self,anotherCounter):
+        for i in range(len(anotherCounter)):
+            self.counter[i]['A'] += anotherCounter.counter[i]['A']
+            self.counter[i]['C'] += anotherCounter.counter[i]['C']
+            self.counter[i]['G'] += anotherCounter.counter[i]['G']
+            self.counter[i]['T'] += anotherCounter.counter[i]['T']
+    def avg(self, num):
+        data = []
+        for i in range(len(self.counter)):
+            maxLetter = 'A'
+            maxFrequence = 0
+            for key in self.counter[i].keys():
+                if self.counter[i][key] > maxFrequence:
+                    maxLetter = key
+                    maxFrequence = self.counter[i][key]
+            data.append(maxLetter)
+        return DNA(data)
     def __str__(self):
         return str(self.counter)
     def __repr__(self):
         return self.__str__()
+    def __len__(self):
+        return len(self.counter)
         
         
 ##test##

@@ -43,15 +43,16 @@ def processLine (line, type):
         line = line.split(',')
         return Point(float(line[0]), float(line[1]))
     elif type == 'DNA':
-        line = list(line)
+        line = list(line.strip())
         return DNA(line)
 
-def constructLocalSum(type, numOfCluster):
+def constructLocalSum(type, numOfCluster, lengthOfDNA):
     '''
     Construct local sum object. E.G. [[PointSum, numberInThisCluster], [PointSum, numberInThisCluster]]
     PointSum is the point representation of sum in each cluster
     @param  type: type of the data
     @param numOfCluster: number of cluster
+    @param lengthOfDNA: the length of DNA 
     @return: an initial localSum list  
     '''
     i = 0;
@@ -61,7 +62,8 @@ def constructLocalSum(type, numOfCluster):
         if type == 'point':
             initSum = [Point(0,0), 0]
         elif type == 'DNA':
-            pass #not implemented yet
+            initSum = [DNACounter(lengthOfDNA),0]
+#    local = initSum * numOfCluster
         local.append(initSum)
         i += 1
     return local;
@@ -82,25 +84,33 @@ def toCluster(data, centroid):
             minIndex = i
     return minIndex
 
-def reCalculateCentroid(localSum, numOfCluster):
+def reCalculateCentroid(localSum, numOfCluster,dataType):
     '''
     node 0 recalculate the centroid array
     @param localSum: the data gathered from other nodes
     @param numOfCluster: the number of final cluster
     @return: newly constructed centroid list
     '''
+    print "94 localSum",localSum
     for i in range(len(localSum)):
         if i == 0:
             continue
         else:
-            for j in range(numOfCluster):
-                localSum[0][j][0].add(localSum[i][j][0])
-                localSum[0][j][1] += (localSum[i][j][1])
+            if dataType == "point":
+                for j in range(numOfCluster):
+                    localSum[0][j][0].add(localSum[i][j][0])
+                    localSum[0][j][1] += (localSum[i][j][1])
+            elif dataType == "DNA":
+                for j in range(numOfCluster):
+                    localSum[0][j][0].addCounter(localSum[i][j][0])
     i = 0;
     centroid = [];
     while i < numOfCluster:
-        localSum[0][i][0].avg(localSum[0][i][1])
-        centroid.append(localSum[0][i][0])
+        rt = localSum[0][i][0].avg(localSum[0][i][1])
+        if dataType == 'point':
+            centroid.append(localSum[0][i][0])
+        elif dataType == 'DNA':
+            centroid.append(rt)
         i += 1
     return centroid
     
@@ -124,8 +134,8 @@ def isProceed(percentage, threshold):
 
 #get COMMandline INPUT_FILE, currently hard code
 NUM_OF_CLUSTER = 2
-INPUT_FILE = 'test.data'
-TYPE_OF_DATA = 'point' #can be point or DNA
+INPUT_FILE = 'testDNA.data'
+TYPE_OF_DATA = 'DNA' #can be point or DNA
 THRESHOLD = 0.05 # when that amount of data does not move, the iteration stops
 
 #get MPI attributes
@@ -179,7 +189,7 @@ print 'processor',RANK,"centroid is",centroid
 proceed = True
 while proceed:
     #init variable
-    localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER)
+    localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER, len(dataset[0]))
     numOfRecluster = 0.0
     #calculate cluster belonging locally
     for data in dataset:
@@ -205,7 +215,7 @@ while proceed:
         localSum = COMM.gather(localSum, root=0)
         if RANK == 0:
             print 'processor',RANK,'receive',localSum
-            centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER)
+            centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER, TYPE_OF_DATA)
             print 'new centroid is:',centroid
         else:
             centroid = None
