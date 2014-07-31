@@ -12,15 +12,15 @@ import linecache
 import sys
 
 ##### helper function definitions #####
-'''
-def formatTime second:
-    
+
+def writeLog(logPath):
+    '''
     format the seconds into
     XX minutes XX seconds
     @param param: time in second
     @return: string after formatted
-    
-'''
+    '''
+
 
 def calLineForEachProcessor (lineOfData, size):
     '''
@@ -63,7 +63,6 @@ def constructLocalSum(type, numOfCluster, lengthOfDNA):
             initSum = [Point(0,0), 0]
         elif type == 'DNA':
             initSum = [DNACounter(lengthOfDNA),0]
-#    local = initSum * numOfCluster
         local.append(initSum)
         i += 1
     return local;
@@ -91,7 +90,6 @@ def reCalculateCentroid(localSum, numOfCluster,dataType):
     @param numOfCluster: the number of final cluster
     @return: newly constructed centroid list
     '''
-    print "94 localSum",localSum
     for i in range(len(localSum)):
         if i == 0:
             continue
@@ -134,8 +132,8 @@ def isProceed(percentage, threshold):
 
 #get COMMandline INPUT_FILE, currently hard code
 NUM_OF_CLUSTER = 2
-INPUT_FILE = 'testDNA.data'
-TYPE_OF_DATA = 'DNA' #can be point or DNA
+INPUT_FILE = 'test.data'
+TYPE_OF_DATA = 'point' #can be point or DNA
 THRESHOLD = 0.05 # when that amount of data does not move, the iteration stops
 
 #get MPI attributes

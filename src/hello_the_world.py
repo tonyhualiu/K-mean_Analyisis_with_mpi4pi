@@ -17,5 +17,5 @@ else:
 
 print "processor",RANK,'DATA',data
 '''
-s = "actg"
-print list(s)
+#s = "actg"
+#print list(s)

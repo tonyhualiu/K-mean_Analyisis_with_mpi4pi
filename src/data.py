@@ -107,20 +107,3 @@ class DNACounter:
         return self.__str__()
     def __len__(self):
         return len(self.counter)
-        
-        
-##test##
-d1 = DNA(['A','C','G','T'])
-d2 = DNA(['A','G','C','T'])
-d3 = DNA(['A','G','C','A'])
-
-#print d1.counter
-#print d2.counter
-
-
-print d1.distance(d2)
-
-d1.add(d2)
-d1.add(d3)
-d1.avg(0)
-print d1
