@@ -13,13 +13,18 @@ import sys
 
 ##### helper function definitions #####
 
-def writeLog(logPath):
+def formatTime():
+    return time.strftime("%Y-%m-%d_%H-%M-%S",time.gmtime())
+
+def writeLog(event, logFile):
     '''
     format the seconds into
     XX minutes XX seconds
-    @param param: time in second
-    @return: string after formatted
+    @param msg: log message
+    @param logPath: the path of logfile 
     '''
+    logFile.write(formatTime() + '\t' + event)
+    logFile.write('\n')
 
 
 def calLineForEachProcessor (lineOfData, size):
@@ -130,27 +135,43 @@ def isProceed(percentage, threshold):
 
 ###################### main routine ############################
 
-#get COMMandline INPUT_FILE, currently hard code
-NUM_OF_CLUSTER = 2
-INPUT_FILE = 'test.data'
-TYPE_OF_DATA = 'point' #can be point or DNA
-THRESHOLD = 0.05 # when that amount of data does not move, the iteration stops
 
+#get commandline: python foo.py <number_of_cluster> <input_path> <type_of_data> [threashold] [logpath] 
+
+
+THRESHOLD = 0.000001
+LOG_PATH = 'log_' + formatTime()
+
+args = sys.argv[1:]
+NUM_OF_CLUSTER = int(args[0])
+INPUT_FILE =  args[1]
+TYPE_OF_DATA = args[2]
+if len(args) > 3: 
+    THRESHOLD = float(args[3])
+if len(args) > 4: 
+    LOG_PATH = args[4]
+
+log = open(LOG_PATH,"a")
 #get MPI attributes
 SIZE = MPI.COMM_WORLD.Get_size()
 RANK = MPI.COMM_WORLD.Get_rank()
 COMM = MPI.COMM_WORLD
 
-#initialize time
-startTime = time.time()
-
+#initialize log
+writeLog("Command line parsed",log)
+writeLog("Program start" ,log)
+writeLog("Num_Of_Cluster = " + str(NUM_OF_CLUSTER) ,log)
+writeLog("INPUT_FILE = " + INPUT_FILE ,log)
+writeLog("TYPE_OF_DATA = " + TYPE_OF_DATA ,log)
+writeLog("THRESHOLD = " + str(THRESHOLD) ,log)
+writeLog("LOG_PATH = " + LOG_PATH ,log)
 ####### read in data from file #######
-currentRank = 0
-splitLength = 0 #calLineForEachProcessor(lineOfData, size)
+writeLog("Start reading data " ,log)
 
+currentRank = 0
+splitLength = 0 
 #DataSet 
 dataset = []
-
 while currentRank < SIZE:
     if currentRank == RANK: #assign job to different node
         lineNo = currentRank + 1;
@@ -165,10 +186,13 @@ while currentRank < SIZE:
             lineNo += SIZE
         splitLength = lineCount       
     currentRank += 1
-print 'processor',RANK,'data is',dataset
+    
+writeLog("Finish reading data " ,log)
+currentRank = None
 ####### end of read in data from file #######
 
 ####### node 0 broadcast the centroid as the first k observations #######
+writeLog("Broadcasting centroids " ,log)
 #centroid list
 centroid = []
 
@@ -178,15 +202,15 @@ else:
     centroid = None
 
 centroid = COMM.bcast(centroid, root = 0)
-
-print 'processor',RANK,"centroid is",centroid
+writeLog("Processor " + str(RANK) +" Initial Centroid is " + str(centroid) ,log)
+writeLog("Finish broadcasting centroids " ,log)
 ####### initial centroid is ready #######
 
 ####### iterate calculation #######
-
+writeLog("Start calculation " ,log)
 proceed = True
 while proceed:
-    #init variable
+    #init local sum and number of recluster
     localSum = constructLocalSum(TYPE_OF_DATA, NUM_OF_CLUSTER, len(dataset[0]))
     numOfRecluster = 0.0
     #calculate cluster belonging locally
@@ -197,7 +221,6 @@ while proceed:
             data.belongTo = belong
         localSum[belong][0].add(data)
         localSum[belong][1] += 1
-    print "Processor", RANK, "localSum", localSum
     
     #send numOfRecluster to node 0 and determine if we need to proceed
     numOfRecluster /= splitLength
@@ -212,14 +235,10 @@ while proceed:
         #send localSum to node 0 and recalculate the centroid, broadcast new centroid
         localSum = COMM.gather(localSum, root=0)
         if RANK == 0:
-            print 'processor',RANK,'receive',localSum
             centroid = reCalculateCentroid(localSum, NUM_OF_CLUSTER, TYPE_OF_DATA)
-            print 'new centroid is:',centroid
         else:
             centroid = None
         centroid = COMM.bcast(centroid, root = 0)
     else:
         break
-
-print 'processor',RANK,'data:',dataset
-print 'start time',startTime
+writeLog("Finish calculation " ,log)
