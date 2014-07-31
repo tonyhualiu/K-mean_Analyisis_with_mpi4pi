@@ -67,14 +67,6 @@ def kmeans (k, sampleDNAs, startingCentroids = None):
     iterationCounter = 0
     previousRoundOfCentroids = []
 
-
-    ###########
-    print 'centroids 72, ', centroids
-    type(centroids)
-    print 'previousRoundOfCentroids 74, ', previousRoundOfCentroids
-    type(previousRoundOfCentroids)
-    ###########
-    
     while (compareCentroids(centroids, previousRoundOfCentroids)):
         clusters = reformCluster(sampleDNAs, centroids)
         iterationCounter += 1
@@ -103,8 +95,6 @@ def compareCentroids(centroidsOne, centroidsTwo):
         return True
 
     for i in range(len(centroidsOne)):
-        print centroidsOne[i]
-        print centroidsTwo[i]
         if centroidsOne[i] == centroidsTwo[i]:
             continue
         else:
@@ -146,7 +136,6 @@ def computeDiff(DNAone, DNAtwo):
     # DNA strands is in same length, according to requirement of this assignment
     diffCounter = 0
     for i in range(len(listOne)):
-        # print i
         if listOne[i] != listTwo[i]:
             diffCounter += 1
     return diffCounter
@@ -171,15 +160,8 @@ def getMeanForOneCluster(lists):
     arrayOfDNA = ['A', 'C', 'G', 'T']
     arrayOfCounter = [0] * 4
 
-    for i in range(len(lists[0])):
-        
-        print i
-        
+    for i in range(len(lists[0])):        
         for item in lists:
-
-            print 'item: ', item
-            print 'item[i]', item[i]
-
             if item[i] in ('A'):
                 arrayOfCounter[0] += 1
             elif item[i] in ('C'):
@@ -189,19 +171,13 @@ def getMeanForOneCluster(lists):
             elif item[i] in ('T'):
                 arrayOfCounter[3] += 1
             
-        print 'arrayofCounter: ', arrayOfCounter
-        print 'max(arrayOfCounter): ', max(arrayOfCounter)
         mostOccured = arrayOfCounter.index(max(arrayOfCounter))
-        print 'mostOccured: ', mostOccured
-        
-        print arrayOfDNA[mostOccured]
         means.append(arrayOfDNA[mostOccured])
-        print 'means after append, ', means
-
-    print 'means, ',    means
     return means
     
 # ### Testing code ###
 dataset = loadDNA("./output.txt")
 clusters = kmeans(3, dataset)
-print clusters
+print 'Threshold:',     clusters['threshold']
+print 'Clusters:',      clusters['clusters']
+print 'Centroids:',     clusters['centroids']

@@ -113,7 +113,6 @@ def findMinDistanceIndex(point, centroids):
 
 def getCentroids (clusters):
     centroids = []
-    print "clusters 117",clusters
     for i in range(len(clusters)):
         centroid = getMeanForOneCluster(clusters[i])
         #print "i",i,"centroid",centroid
@@ -130,12 +129,9 @@ def getMeanForOneCluster (lists):
     #
     for item in lists:
         for i in range(numOfAttributes):
-            means[i] += item[i]
-    print "135 means, after sum",means
-    #         
+            means[i] += item[i]             
     for j in range(numOfAttributes):
         means[j] = means[j] / float(len(lists))
-    print "139 means, after division",means
     return tuple(means)
 
 def computeDistance (pointOne, pointTwo):
@@ -154,7 +150,6 @@ def computeDistance (pointOne, pointTwo):
 #dataset = loadCSV("./test_2D_points.txt")
 dataset = loadCSV("src/test.data")
 clusters = kmeans(3, dataset)
-print clusters
-#print clusters["clusters"]
-#print clusters["centroids"]
-#print clusters["threshold"]
+print 'Threshold:',     clusters['threshold']
+print 'Clusters:',      clusters['clusters']
+print 'Centroids:',     clusters['centroids']
