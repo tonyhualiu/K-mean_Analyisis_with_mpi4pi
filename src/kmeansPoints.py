@@ -48,6 +48,16 @@ def kmeans(k, sampleData, startingCentroids=None):
     given the number of k, the sample group of data and initial centroids
     the method will calculate the k means
     '''
+    
+    '''
+    To log the information for analysis
+        time
+        iterationCounter
+        input data size
+    '''
+    print formatTime(), 'Begin K-means Calculation'
+
+
     result = {}
     # initialize centroids for the first phase
     if (startingCentroids == None or len(startingCentroids) < k):
@@ -144,12 +154,14 @@ def computeDistance (pointOne, pointTwo):
         result += (pointOne[i] - pointTwo[i]) ** 2
     return result
 
-
+def formatTime():
+    return time.strftime("%Y-%m-%d_%H-%M-%S",time.gmtime())
     
 ### Testing code ###
 #dataset = loadCSV("./test_2D_points.txt")
 dataset = loadCSV("src/test.data")
 clusters = kmeans(3, dataset)
-print 'Threshold:',     clusters['threshold']
+# print 'Threshold:',     clusters['threshold']
 print 'Clusters:',      clusters['clusters']
 print 'Centroids:',     clusters['centroids']
+print  formatTime(), 'Finished K-means Calculation'

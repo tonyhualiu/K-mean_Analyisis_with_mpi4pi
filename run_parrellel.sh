@@ -74,9 +74,9 @@ if [ "$t" != "$point" ] && [ "$t" != "$dna" ];then
 fi
 
 if [ "$t" = "$point" ];then	
-	python generaterawdata.py -c $c -p $p -o $f -v $v
+	python src/generaterawdata.py -c $c -p $p -o $f -v $v
 else
-	python generatorawdata.py -c $c -p $p -o $f -v $v
+	python src/generatorawdata.py -c $c -p $p -o $f -v $v
 fi
 
 mpiexec -n $n -machinefile $m python src/ParallelMachine.py $c $f $t $h $l 

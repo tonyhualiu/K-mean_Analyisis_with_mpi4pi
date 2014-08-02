@@ -47,6 +47,15 @@ def kmeans (k, sampleDNAs, startingCentroids = None):
     the method will caculate the k means
     '''
 
+    '''
+    To log the information for analysis
+        time
+        iterationCounter
+        input data size
+    '''
+    print formatTime(), 'Begin K-means Calculation'
+
+
     result = {}
     # initialize centroids for the first phase
     if (startingCentroids == None or len(startingCentroids) < k):
@@ -174,10 +183,15 @@ def getMeanForOneCluster(lists):
         mostOccured = arrayOfCounter.index(max(arrayOfCounter))
         means.append(arrayOfDNA[mostOccured])
     return means
-    
+
+
+def formatTime():
+    return time.strftime("%Y-%m-%d_%H-%M-%S",time.gmtime())
+
 # ### Testing code ###
 dataset = loadDNA("./output.txt")
 clusters = kmeans(3, dataset)
-print 'Threshold:',     clusters['threshold']
+# print 'Threshold:',     clusters['threshold']
 print 'Clusters:',      clusters['clusters']
 print 'Centroids:',     clusters['centroids']
+print  formatTime(), 'Finished K-means Calculation'
