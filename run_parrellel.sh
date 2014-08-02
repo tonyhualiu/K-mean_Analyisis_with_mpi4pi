@@ -1,7 +1,17 @@
 #!/bin/bash
 
 usage(){
-	echo "usage: \n\t-c <number of cluster>\n\t-n <number of processor>\n\t-m <path of machine file>\n\t-p <number of points per cluster>\n\t-f <data file path>\n\t-t <type of data['point' or 'DNA']>\n\t-v <max value of point or length of DNA>\n\t-h <threshold>\n\t-l <logpath>\nall must be speficified."
+	echo "usage:
+	-c <number of cluster>
+	-n <number of processor>
+	-m <path of machine file>
+	-p <number of points per cluster>
+	-f <data file path>
+	-t <type of data['point' or 'DNA']>
+	-v <max value of point or length of DNA> 
+	-h <threshold>
+	-l <logpath>
+all must be speficified."
 };
 
 c=
