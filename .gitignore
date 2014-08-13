@@ -1,2 +1,5 @@
+#project info
 .project
 .pydevproject
+#test file
+src/hello_the_world.py
